@@ -24,8 +24,17 @@ class App extends React.Component {
     this.socket.on("user_connected", usrName => {
       let tempLog = this.state.userLog;
       //tempLog.push({ user: usrName, text: tempMsg });
-      tempLog.push(`${usrName} connected`);
+      var today = new Date();
+      var time =
+        today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+      tempLog.push(`${time}: ${usrName} connected`);
       this.setState({ userLog: tempLog });
+
+      this.socket.on("user-disconnected", userName => {
+        let tempLog = this.state.userLog;
+        tempLog.push(`${time}: ${usrName} connected`);
+        this.setState({ userLog: tempLog });
+      });
     });
 
     this.socket.on("chat-message", message => {
