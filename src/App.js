@@ -1,13 +1,16 @@
 import React from "react";
 import "./App.css";
 import io from "socket.io-client";
+import Chatroom from "./components/chatroom";
+import Userlog from "./components/userlog";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       chatMsg: "",
-      chatLog: []
+      chatLog: [],
+      userLog: []
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -19,14 +22,19 @@ class App extends React.Component {
     this.socket.emit("new_user", usrName);
 
     this.socket.on("user_connected", usrName => {
-      let tempLog = this.state.chatLog;
-      tempLog.push(`${usrName} joined`);
-      this.setState({ chatLog: tempLog });
+      let tempLog = this.state.userLog;
+      //tempLog.push({ user: usrName, text: tempMsg });
+      tempLog.push(`${usrName} connected`);
+      this.setState({ userLog: tempLog });
     });
 
     this.socket.on("chat-message", message => {
       let tempLog = this.state.chatLog;
-      tempLog.push(`${message.userName}:${message.text}`);
+      tempLog.push({
+        user: message.userName,
+        text: message.text,
+        isuser: false
+      });
       this.setState({ chatLog: tempLog });
     });
   }
@@ -38,26 +46,30 @@ class App extends React.Component {
     this.socket.emit("chat-message", this.state.chatMsg);
     let tempMsg = this.state.chatMsg;
     let tempLog = this.state.chatLog;
-    tempLog.push(`You:${tempMsg}`);
+    tempLog.push({ user: "You", text: tempMsg, isuser: true });
     this.setState({ chatLog: tempLog, chatMsg: "" });
   }
   render() {
     return (
       <div className="App">
         <header className="App-header" />
-        <form onSubmit={this.handleSubmit}>
-          <label>
-            <input
-              type="text"
-              value={this.state.chatMsg}
-              onChange={this.handleChange}
-            />
-          </label>
-          <input type="submit" value="Submit" />
-        </form>
-        {this.state.chatLog.map((msg, index) => (
-          <div key={index}> {msg}</div>
-        ))}
+        <div className="app_wrapper">
+          <div className="chat_wrapper">
+            <Chatroom chatLog={this.state.chatLog} />
+            <form onSubmit={this.handleSubmit} className="Form">
+              <label>
+                <input
+                  class="form_input"
+                  value={this.state.chatMsg}
+                  onChange={this.handleChange}
+                />
+              </label>
+            </form>
+          </div>
+          <div className="log_container">
+            <Userlog userLog={this.state.userLog} />
+          </div>
+        </div>
       </div>
     );
   }
