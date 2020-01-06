@@ -10,7 +10,7 @@
 ## Available Scripts
 
 Run in server directory
-### `nodeman index.js`
+### `nodemon index.js`
 
 Runs the app  mode.<br>
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
